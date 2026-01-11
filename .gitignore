@@ -27,7 +27,6 @@ dist-ssr
 .env
 .env.local
 .env.production
-dist
 build
 .next
 .vercel
