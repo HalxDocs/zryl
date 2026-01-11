@@ -34,7 +34,7 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-end gap-6">
             <div className="flex items-center gap-6">
               <a
-                href="https://github.com/your-org/zryl"
+                href="https://github.com/HalxDocs/zryl"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-white transition-all group"

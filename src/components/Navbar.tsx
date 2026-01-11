@@ -81,7 +81,7 @@ export default function Navbar() {
         {/* Right: GitHub */}
         <div className="flex items-center">
           <a
-            href="https://github.com/your-org/zryl"
+            href="https://github.com/HalxDocs/zryl"
             target="_blank"
             rel="noreferrer"
             className="group relative"
