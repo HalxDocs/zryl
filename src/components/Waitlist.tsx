@@ -107,7 +107,7 @@ export default function Waitlist() {
               </span>
               <div className="w-1 h-1 rounded-full bg-zinc-700" />
               <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest">
-                Status: Awaiting entry
+                Status: Awaiting entry.
               </span>
             </div>
           </div>
