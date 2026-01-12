@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
 
+    <!-- Viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <!-- Favicon (ZRYL logo) -->
     <link
       rel="icon"
@@ -10,40 +13,41 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M12 10L18 14L12 18' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M28 30L22 26L28 22' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%233b82f6'/%3E%3Crect x='2' y='2' width='36' height='36' rx='10' stroke='white' stroke-opacity='0.1' stroke-width='1'/%3E%3C/svg%3E"
     />
 
-    <!-- Viewport -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <!-- Primary Meta -->
     <title>zryl — preserve command executions</title>
     <meta
       name="description"
-      content="zryl is an open-source CLI for saving what happened when you ran a command and sharing it as a single link."
+      content="zryl is an open-source CLI that captures what happened when a command ran and turns it into a clean, shareable execution artifact."
     />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <!-- Canonical (update to zryl.sh later) -->
+    <link rel="canonical" href="https://zryl.vercel.app" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="zryl — preserve command executions" />
     <meta
       property="og:description"
-      content="Save exactly what happened when you ran a command. Share it as a clean execution artifact."
+      content="Save exactly what happened when you ran a command. No screenshots. No copy-paste. Just the run."
     />
-    <meta property="og:url" content="https://zryl.app" />
-    <!-- Optional later: og:image -->
-    <!-- <meta property="og:image" content="https://zryl.app/og.png" /> -->
+    <meta property="og:url" content="https://zryl.vercel.app" />
 
     <!-- Twitter / X -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="zryl — preserve command executions" />
     <meta
       name="twitter:description"
       content="An open-source CLI for sharing what actually happened when a command ran."
     />
-    <!-- Optional later -->
-    <!-- <meta name="twitter:image" content="https://zryl.app/og.png" /> -->
+
+    <!-- App entry (Vite) -->
+    <script type="module" src="/src/main.tsx"></script>
   </head>
 
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
