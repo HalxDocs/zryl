@@ -44,9 +44,11 @@ Download zryl-windows-amd64.exe from Releases
 
 Rename it to zryl.exe
 
-Add it to your PATH
+*Add it to your PATH*
 
-Usage
+---
+
+## Usage
 bash
 Copy code
 zryl run npm test
