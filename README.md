@@ -1,32 +1,33 @@
 # zryl
 
-Preserve command executions as shareable artifacts.
+**No screenshots. Just the real run.**
 
-zryl is an open-source CLI that captures exactly what happened when you ran a command — the output, the result, and the context it ran in — and turns it into a single, shareable execution artifact.
+zryl is an open-source CLI that captures what actually happened when a command ran  
+— the output, exit status, and environment — and turns it into a shareable link.
 
-No screenshots. No copy-paste. No guessing.
+It gives you a single source of truth for:
+- what was run
+- what it printed
+- how it exited
+- where it ran
 
----
-
-## Why zryl?
-
-If you’ve ever:
-- pasted terminal output into Slack
-- sent a screenshot of a failed command
-- rerun something just to prove an error
-- set up CI just to show a result
-
-…you already know the problem.
-
-zryl gives you a reliable source of truth for command execution.
+One command. One run. One link.
 
 ---
 
-## Usage
+## Example
 
 ```bash
-zryl python app.py
-zryl npm test
-zryl go test ./...
+zryl run npm test
+zryl executes the command, captures the full result, and prints a link you can share:
 
-start the repo - Thanks
+text
+Copy code
+[zryl] link: https://zryl.vercel.app/run/ca312ad3...
+Why
+Terminal output is still shared through screenshots, copy-paste, or CI logs.
+zryl preserves the exact execution so there’s no missing context and no ambiguity.
+
+Status
+zryl is early-stage and evolving quickly.
+Feedback and ideas are welcome.
