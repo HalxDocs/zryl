@@ -14,6 +14,7 @@ type Run = {
   os: string;
   arch: string;
   cwd: string;
+  visibility: "public" | "private";
 };
 
 export default function RunPage() {
@@ -38,6 +39,7 @@ export default function RunPage() {
           .from("runs")
           .select("*")
           .eq("id", id)
+          .eq("visibility", "public") // 🔒 critical
           .maybeSingle();
 
         if (cancelled) return;
@@ -48,7 +50,7 @@ export default function RunPage() {
         }
 
         if (!data) {
-          setError("Run not found");
+          setError("Run not found or not public");
           return;
         }
 

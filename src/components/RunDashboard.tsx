@@ -18,8 +18,9 @@ type Run = {
   command: string;
   stdout: string[] | null;
   stderr: string[] | null;
-  exit_code: number;
+  exit_code: number | null;
   created_at: string;
+  visibility: "public" | "private";
 };
 
 type Status = "running" | "success" | "error";
@@ -34,9 +35,7 @@ function StatusBadge({ status }: { status: Status }) {
   };
 
   return (
-    <span
-      className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${styles[status]}`}
-    >
+    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${styles[status]}`}>
       {status}
     </span>
   );
@@ -54,36 +53,55 @@ export default function RunDashboard() {
   /* ---------------- Fetch runs ---------------- */
 
   useEffect(() => {
-    supabase
-      .from("runs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(limit)
-      .then(({ data }) => {
-        if (!data || data.length === 0) return;
+    let cancelled = false;
+
+    async function fetchRuns() {
+      const { data } = await supabase
+        .from("runs")
+        .select("*")
+        .eq("visibility", "public")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      if (!cancelled && data) {
         setRuns(data);
-        if (!activeRunId) setActiveRunId(data[0].id);
-      });
+      }
+    }
+
+    fetchRuns();
+    return () => {
+      cancelled = true;
+    };
   }, [limit]);
 
   /* ---------------- Realtime ---------------- */
 
   useEffect(() => {
     const channel = supabase
-      .channel("runs-realtime")
+      .channel("runs-public")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "runs" },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "runs",
+          filter: "visibility=eq.public",
+        },
         (payload) => {
           const newRun = payload.new as Run;
-          setRuns((prev) => [newRun, ...prev]);
+          setRuns((prev) => [newRun, ...prev].slice(0, limit));
           setActiveRunId(newRun.id);
           setStreamIndex(0);
         }
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "runs" },
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "runs",
+          filter: "visibility=eq.public",
+        },
         (payload) => {
           const updated = payload.new as Run;
           setRuns((prev) =>
@@ -96,9 +114,22 @@ export default function RunDashboard() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [limit]);
 
-  /* ---------------- Derived state (SAFE) ---------------- */
+  /* ---------------- Active run safety ---------------- */
+
+  useEffect(() => {
+    if (runs.length === 0) {
+      setActiveRunId(null);
+      return;
+    }
+
+    if (!activeRunId || !runs.some((r) => r.id === activeRunId)) {
+      setActiveRunId(runs[0].id);
+    }
+  }, [runs, activeRunId]);
+
+  /* ---------------- Derived state ---------------- */
 
   const activeRun = runs.find((r) => r.id === activeRunId) ?? null;
 
@@ -108,7 +139,7 @@ export default function RunDashboard() {
   }, [activeRun]);
 
   const status: Status = useMemo(() => {
-    if (!activeRun) return "running";
+    if (!activeRun || activeRun.exit_code === null) return "running";
     return activeRun.exit_code === 0 ? "success" : "error";
   }, [activeRun]);
 
@@ -131,7 +162,6 @@ export default function RunDashboard() {
       <div className="absolute -inset-4 bg-blue-500/5 blur-3xl rounded-[3rem]" />
 
       <div className="relative bg-zinc-950 border border-white/8 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="px-6 py-4 border-b border-white/5 bg-zinc-900/20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity size={12} className="text-blue-500" />
@@ -159,7 +189,11 @@ export default function RunDashboard() {
                   </span>
                   <span
                     className={`w-2 h-2 rounded-full ${
-                      run.exit_code === 0 ? "bg-green-500" : "bg-red-500"
+                      run.exit_code === null
+                        ? "bg-yellow-500"
+                        : run.exit_code === 0
+                        ? "bg-green-500"
+                        : "bg-red-500"
                     }`}
                   />
                 </div>
@@ -171,13 +205,6 @@ export default function RunDashboard() {
                 </div>
               </button>
             ))}
-
-            <button
-              onClick={() => setLimit((l) => l + 5)}
-              className="w-full py-2 text-xs text-zinc-500 hover:text-white border-t border-white/5"
-            >
-              Load more
-            </button>
           </div>
 
           {/* Main */}
@@ -206,10 +233,7 @@ export default function RunDashboard() {
                 </div>
 
                 {visibleOutput.map((line, i) => (
-                  <div
-                    key={i}
-                    className="text-zinc-400 pl-4 border-l border-white/5"
-                  >
+                  <div key={i} className="text-zinc-400 pl-4 border-l border-white/5">
                     {line}
                   </div>
                 ))}
@@ -225,7 +249,7 @@ export default function RunDashboard() {
               </>
             ) : (
               <div className="h-full flex items-center justify-center text-zinc-600">
-                Initializing…
+                No runs yet
               </div>
             )}
           </div>
