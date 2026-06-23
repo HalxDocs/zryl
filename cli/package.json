@@ -1,6 +1,6 @@
 {
   "name": "@halxdocs/zryl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Run commands and share the output — an open-source CLI for sharing terminal executions",
   "license": "MIT",
   "bin": {
@@ -35,6 +35,7 @@
   "homepage": "https://zryl.vercel.app",
   "files": [
     "bin/",
-    "scripts/"
+    "scripts/",
+    "README.md"
   ]
 }
