@@ -19,21 +19,21 @@ type Run = {
   visibility: "public" | "private";
 };
 
+type PageState =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "empty" }
+  | { status: "ready"; run: Run };
+
 export default function RunPage() {
   const { id } = useParams<{ id: string }>();
-
-  const [run, setRun] = useState<Run | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(
-    id ? null : "Missing run ID"
+  const [state, setState] = useState<PageState>(
+    id ? { status: "loading" } : { status: "error", message: "Missing run ID" }
   );
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
+    if (!id) return;
 
     let cancelled = false;
 
@@ -49,23 +49,19 @@ export default function RunPage() {
         if (cancelled) return;
 
         if (dbError) {
-          setError(dbError.message);
+          setState({ status: "error", message: dbError.message });
           return;
         }
 
         if (!data) {
-          setError("Run not found or not public");
+          setState({ status: "error", message: "Run not found or not public" });
           return;
         }
 
-        setRun(data);
+        setState({ status: "ready", run: data });
       } catch {
         if (!cancelled) {
-          setError("Failed to load run");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
+          setState({ status: "error", message: "Failed to load run" });
         }
       }
     }
@@ -78,27 +74,30 @@ export default function RunPage() {
   }, [id]);
 
   useEffect(() => {
-    if (run) {
-      document.title = `$ ${run.command} — zryl`;
+    if (state.status === "ready") {
+      document.title = `$ ${state.run.command} — zryl`;
     }
     return () => {
       document.title = "zryl — preserve command executions";
     };
-  }, [run]);
+  }, [state]);
 
   const handleCopy = useCallback(async () => {
-    if (!run) return;
+    if (state.status !== "ready") return;
     try {
-      const output = [...(run.stdout ?? []), ...(run.stderr ?? [])].join("\n");
+      const output = [
+        ...(state.run.stdout ?? []),
+        ...(state.run.stderr ?? []),
+      ].join("\n");
       await copyToClipboard(output);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
       // fail silently
     }
-  }, [run]);
+  }, [state]);
 
-  if (loading) {
+  if (state.status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050505] text-zinc-500 text-sm">
         Loading…
@@ -106,10 +105,10 @@ export default function RunPage() {
     );
   }
 
-  if (error || !run) {
+  if (state.status === "error") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-zinc-400 px-6 gap-4">
-        <p className="text-red-400/80 text-sm">{error ?? "Run not found"}</p>
+        <p className="text-red-400/80 text-sm">{state.message}</p>
         <Link
           to="/"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-white transition-colors"
@@ -121,6 +120,7 @@ export default function RunPage() {
     );
   }
 
+  const run = state.run;
   const stdout = run.stdout ?? [];
   const stderr = run.stderr ?? [];
 
