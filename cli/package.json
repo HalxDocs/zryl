@@ -1,0 +1,22 @@
+{
+  "name": "zryl",
+  "version": "1.0.0",
+  "description": "Run commands and share the output — an open-source CLI for sharing terminal executions",
+  "license": "MIT",
+  "bin": {
+    "zryl": "bin/zryl"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "postinstall": "node scripts/install.js"
+  },
+  "keywords": ["cli", "terminal", "share", "command", "run", "output"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HalxDocs/zryl"
+  },
+  "files": [
+    "bin/",
+    "scripts/"
+  ]
+}

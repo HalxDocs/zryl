@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, supabaseReady } from "../lib/supabase";
 import { ArrowLeft, Copy, Check, Terminal } from "lucide-react";
 import { copyToClipboard } from "../lib/copy";
 
@@ -28,12 +28,16 @@ type PageState =
 export default function RunPage() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<PageState>(
-    id ? { status: "loading" } : { status: "error", message: "Missing run ID" }
+    !id
+      ? { status: "error", message: "Missing run ID" }
+      : !supabaseReady
+      ? { status: "error", message: "Supabase not configured" }
+      : { status: "loading" }
   );
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !supabaseReady) return;
 
     let cancelled = false;
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, supabaseReady } from "../lib/supabase";
 import { Link } from "react-router-dom";
 import {
   Terminal,
@@ -33,11 +33,15 @@ export default function RunDashboard() {
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [streamIndex, setStreamIndex] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(
+    supabaseReady ? null : "Supabase not configured"
+  );
 
   /* ---------------- Fetch runs ---------------- */
 
   useEffect(() => {
+    if (!supabaseReady) return;
+
     let cancelled = false;
 
     async function fetchRuns() {
@@ -69,6 +73,8 @@ export default function RunDashboard() {
   /* ---------------- Realtime ---------------- */
 
   useEffect(() => {
+    if (!supabaseReady) return;
+
     const channel = supabase
       .channel("runs-public")
       .on(
@@ -264,9 +270,14 @@ export default function RunDashboard() {
             ) : (
               <div className="h-full flex items-center justify-center">
                 {fetchError ? (
-                  <span className="text-xs text-red-400/70">
-                    Failed to load runs
-                  </span>
+                  <div className="text-center space-y-1">
+                    <span className="text-xs text-red-400/70 block">
+                      Failed to load runs
+                    </span>
+                    <span className="text-[10px] text-zinc-600 block font-mono">
+                      {fetchError}
+                    </span>
+                  </div>
                 ) : (
                   <span className="text-xs text-zinc-600">No runs yet</span>
                 )}

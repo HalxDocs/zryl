@@ -1,0 +1,12 @@
+#!/bin/sh
+# zryl CLI wrapper — resolves to the correct platform binary
+DIR="$(cd "$(dirname "$0")" && pwd)"
+PLATFORM="$(uname -s)-$(uname -m)"
+case "$PLATFORM" in
+  Linux-x86_64)   BIN="zryl-linux-amd64" ;;
+  Linux-aarch64)  BIN="zryl-linux-arm64" ;;
+  Darwin-arm64)   BIN="zryl-darwin-arm64" ;;
+  Darwin-x86_64)  BIN="zryl-darwin-amd64" ;;
+  *) echo "zryl: unsupported platform $PLATFORM" >&2; exit 1 ;;
+esac
+exec "$DIR/$BIN" "$@"
