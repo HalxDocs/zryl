@@ -1,12 +1,33 @@
-#!/bin/sh
-# zryl CLI wrapper — resolves to the correct platform binary
-DIR="$(cd "$(dirname "$0")" && pwd)"
-PLATFORM="$(uname -s)-$(uname -m)"
-case "$PLATFORM" in
-  Linux-x86_64)   BIN="zryl-linux-amd64" ;;
-  Linux-aarch64)  BIN="zryl-linux-arm64" ;;
-  Darwin-arm64)   BIN="zryl-darwin-arm64" ;;
-  Darwin-x86_64)  BIN="zryl-darwin-amd64" ;;
-  *) echo "zryl: unsupported platform $PLATFORM" >&2; exit 1 ;;
-esac
-exec "$DIR/$BIN" "$@"
+#!/usr/bin/env node
+const { execFileSync } = require("child_process");
+const path = require("path");
+const fs = require("fs");
+
+const dir = __dirname;
+const platform = process.platform;
+const arch = process.arch;
+
+let bin;
+if (platform === "linux" && arch === "x64") bin = "zryl-linux-amd64";
+else if (platform === "linux" && arch === "arm64") bin = "zryl-linux-arm64";
+else if (platform === "darwin" && arch === "x64") bin = "zryl-darwin-amd64";
+else if (platform === "darwin" && arch === "arm64") bin = "zryl-darwin-arm64";
+else if (platform === "win32" && arch === "x64") bin = "zryl-windows-amd64.exe";
+else {
+  console.error("zryl: unsupported platform " + platform + "/" + arch);
+  console.error("Build from source: https://github.com/HalxDocs/zryl");
+  process.exit(1);
+}
+
+const binPath = path.join(dir, bin);
+if (!fs.existsSync(binPath)) {
+  console.error("zryl: binary not found: " + bin);
+  console.error("Try reinstalling: npm install -g zryl");
+  process.exit(1);
+}
+
+try {
+  execFileSync(binPath, process.argv.slice(2), { stdio: "inherit" });
+} catch (e) {
+  process.exit(e.status || 1);
+}

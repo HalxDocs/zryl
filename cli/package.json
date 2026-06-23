@@ -1,20 +1,38 @@
 {
-  "name": "zryl",
+  "name": "@halxdocs/zryl",
   "version": "1.0.0",
   "description": "Run commands and share the output — an open-source CLI for sharing terminal executions",
   "license": "MIT",
   "bin": {
-    "zryl": "bin/zryl"
+    "zryl": "bin/zryl",
+    "zryl.cmd": "bin/zryl.cmd"
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "postinstall": "node scripts/install.js"
+    "prepublishOnly": "node scripts/build.js"
   },
-  "keywords": ["cli", "terminal", "share", "command", "run", "output"],
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "cli",
+    "terminal",
+    "share",
+    "command",
+    "run",
+    "output",
+    "devtools",
+    "developer-tools"
+  ],
+  "author": "zryl",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HalxDocs/zryl"
+    "url": "git+https://github.com/HalxDocs/zryl.git"
   },
+  "bugs": {
+    "url": "https://github.com/HalxDocs/zryl/issues"
+  },
+  "homepage": "https://zryl.vercel.app",
   "files": [
     "bin/",
     "scripts/"
